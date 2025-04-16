@@ -1,8 +1,8 @@
 # main links
 main:
-  - title: "Malware Analysis"
+  - title: "Malware-Analysis"
     url: /categories/#malware-analysis
-  - title: "OS Internals"
+  - title: "OS-Internals"
     url: /categories/#os-internals
 #  - title: "CTF Writeups"
 #    url: /categories/#ctf-writeups
