@@ -113,33 +113,11 @@ typedef union _PDPTE_64 {
 		UINT64 pwt : 1;
 		UINT64 pcd : 1;
 		UINT64 a : 1;
-		union {
-			UINT64 d : 1;
-			UINT64 ignored1 : 1;
-		} NOUNIONNAME1;
+		UINT64 ignored1 : 1;
 		UINT64 ps : 1;
-		union {
-			struct {
-				UINT64 g : 1;
-				UINT64 ignored2 : 3;
-			};
-			UINT64 ignored3 : 4;
-		} NOUNIONNAME2;
-		union {
-			struct {
-				UINT64 pat : 1;
-				UINT64 reserved : 17;
-				UINT64 gbframe : 22;
-			};
-			UINT64 pd : 40;
-		} NOUNIONNAME3;
-		union {
-			struct {
-				UINT64 ignored4 : 7;
-				UINT64 pk : 4;
-			};
-			UINT64 ignored5 : 11;
-		} NOUNIONNAME4;
+		UINT64 ignored3 : 4;
+		UINT64 pd : 40;
+		UINT64 ignored5 : 11;
 		UINT64 nx : 1;
 	};
 } PDPTE_64;
@@ -154,36 +132,11 @@ typedef union {
 		UINT64 pwt : 1;
 		UINT64 pcd : 1;
 		UINT64 a : 1;
-		union {
-			UINT64 d : 1;
-			UINT64 ignored1 : 1;
-		}NOUNIONNAME5;
+		UINT64 ignored1 : 1;
 		UINT64 ps : 1;
-		union {
-			struct {
-				UINT64 g : 1;
-				UINT64 ignored2 : 3;
-			};
-			UINT64 ignored3 : 4;
-		}NOUNIONNAME6;
-
-		 union {
-			struct {
-				UINT64 pat : 1;
-				UINT64 reserved1 : 8;
-				UINT64 mbframe : 31;
-			};
-			UINT64 pt : 40;
-		}NOUNIONNAME7;
-
-		union {
-			struct {
-				UINT64 ignored4 : 7;
-				UINT64 pk : 4;
-			};
-			UINT64 ignored5 : 11;
-		}NOUNIONNAME8;
-
+		UINT64 ignored3 : 4;
+		UINT64 pt : 40;
+		UINT64 ignored5 : 11;
 		UINT64 nx : 1;
 	};
 }PDE_64;
@@ -229,8 +182,8 @@ typedef _VirtualAddress VIRTUAL_ADDRESS;
 
 typedef struct _INPUT {
 	UINT64 vAddress;
-}INPUT,*PINPUT;
+}INPUT, * PINPUT;
 
 typedef struct _OUTPUT {
 	UINT64 pAddress;
-}OUTPUT,*POUTPUT;
+}OUTPUT, * POUTPUT;

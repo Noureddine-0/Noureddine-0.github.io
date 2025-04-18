@@ -17,7 +17,7 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegisteryPath) {
 	PDEVICE_OBJECT DeviceObject;
 
 	DriverObject->DriverUnload = DriverExit;
-	
+
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverCreateClose;
 	DriverObject->MajorFunction[IRP_MJ_CLOSE] = DriverCreateClose;
 
@@ -107,10 +107,10 @@ UINT64 Translate(UINT64 VirtualAddress) {
 		goto Error;
 	}
 	PTE_64 pte = ptTableVirtual[vAddr.pt_index];
-	return (pte.flags & PT_TABLE_PHYSICAL_ADDRESS_MASK) | (vAddr.offset);
+	return (pte.pf << 12) | (vAddr.offset);
 
-	Error:
-		return 0;
+Error:
+	return 0;
 }
 
 void  DriverExit(_In_ PDRIVER_OBJECT DriverObject) {
@@ -145,29 +145,30 @@ NTSTATUS DriverDeviceControl(_In_ PDEVICE_OBJECT DeviceObject, _In_ PIRP Irp) {
 	auto status = STATUS_SUCCESS;
 
 	switch (stack->Parameters.DeviceIoControl.IoControlCode) {
-		case IOCTL_TRANSLATOR_TRANSLATE_ADDRESS: {
-			auto data = (PINPUT)stack->Parameters.DeviceIoControl.Type3InputBuffer;
-			if (data !=nullptr) {
-				if (data->vAddress == 0) {
-					status = STATUS_INVALID_PARAMETER;
-					goto Finish;
-				}
-				if (!CheckPagingMode()) {
-					status = STATUS_INVALID_PARAMETER;
-					goto Finish;
-				}
-				POUTPUT pOutput= (POUTPUT)Irp->AssociatedIrp.SystemBuffer;
-				pOutput->pAddress = Translate(data->vAddress);
-			}else
+	case IOCTL_TRANSLATOR_TRANSLATE_ADDRESS: {
+		auto data = (PINPUT)Irp->AssociatedIrp.SystemBuffer;
+		if (data != nullptr) {
+			if (data->vAddress == 0) {
 				status = STATUS_INVALID_PARAMETER;
-			break;
+				goto Finish;
+			}
+			if (!CheckPagingMode()) {
+				status = STATUS_INVALID_PARAMETER;
+				goto Finish;
+			}
+			POUTPUT pOutput = (POUTPUT)Irp->AssociatedIrp.SystemBuffer;
+			pOutput->pAddress = Translate(data->vAddress);
 		}
-		default:
-			status = STATUS_INVALID_DEVICE_REQUEST;
-			break;
+		else
+			status = STATUS_INVALID_PARAMETER;
+		break;
+	}
+	default:
+		status = STATUS_INVALID_DEVICE_REQUEST;
+		break;
 	}
 
-	Finish:
+Finish:
 	Irp->IoStatus.Status = STATUS_SUCCESS;
 	(NT_SUCCESS(status)) ? Irp->IoStatus.Information = sizeof(OUTPUT) : 0;
 	IoCompleteRequest(Irp, IO_NO_INCREMENT);
